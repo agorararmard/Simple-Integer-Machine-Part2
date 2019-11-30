@@ -1,0 +1,25 @@
+READ $0
+READ $1
+READ $2
+LE $0,$1,$4
+JMP0 $4, 13
+LE $0,$2,$4
+JMP0 $4, 17
+LE $1,$2,$4
+JMP0 $4, 21
+WRITE $0
+WRITE $1
+WRITE $2
+HALT
+ASS $1,$4
+ASS $0,$1
+ASS $4,$0
+JMP 5
+ASS $0,$4
+ASS $2,$0
+ASS $4,$2
+JMP 7
+ASS $1,$4
+ASS $2,$1
+ASS $4,$2
+JMP 9
