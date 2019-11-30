@@ -5,8 +5,9 @@ class Instruction2Param: public Instruction{
         int *rs;
         bool isRdAddress;
         bool isRsAddress;
+        std::mutex *rdm;
     public:
-    Instruction2Param(int& rs, bool isRsAddress,int& rd, bool isRdAddress):rd(&rd),isRdAddress(isRdAddress),rs(&rs),isRsAddress(isRsAddress){
+    Instruction2Param(int& rs, bool isRsAddress,int& rd, bool isRdAddress,std::mutex &rdm):rd(&rd),isRdAddress(isRdAddress),rs(&rs),isRsAddress(isRsAddress),rdm(&rdm){
 
     }
 

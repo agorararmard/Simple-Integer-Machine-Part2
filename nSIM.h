@@ -2,14 +2,15 @@
 #define NSIM_H
 
 #include"Processor.h"
-#include <iostream>
-#include <string>
 #include <thread>
 class nSIM{
     private:
         int n;  //number of processors
         int dataMemory[dataMemorySize];
-        Proccessor** cores;
+        Processor** cores;
+        std::mutex ReadMutex;
+        std::mutex WriteMutex;
+        std::mutex memoryWrite[dataMemorySize];
     public:
         nSIM(int numberOfCores);  
         void load();

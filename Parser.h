@@ -9,6 +9,10 @@ class Parser{
         int* dataMemory;
         Instruction** instMemory;
         int* pc;
+        std::mutex *ReadMutex;
+        std::mutex *WriteMutex;
+        std::mutex *memoryWrite;
+
        
         std::string fileInst;
        
@@ -19,7 +23,7 @@ class Parser{
 
     public:
         // pointers to the instruction and data memory and to the pc. To write the instructions properly in terms of references
-        Parser(int* &dataMemory,Instruction** &instMemory,int& pc, std::string fileInst):dataMemory(dataMemory),instMemory(instMemory),pc(&pc),fileInst(fileInst){}
+        Parser(int* &dataMemory,Instruction** &instMemory,int& pc, std::string fileInst, std::mutex* &rm, std::mutex* &wm, std::mutex* &mw):dataMemory(dataMemory),instMemory(instMemory),pc(&pc),fileInst(fileInst),ReadMutex(rm),WriteMutex(wm),memoryWrite(mw){}
         
         void readInstMem();//Function to read a program file and load it into the instruction memory;
 

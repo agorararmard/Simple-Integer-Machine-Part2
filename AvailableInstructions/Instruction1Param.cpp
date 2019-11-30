@@ -3,8 +3,10 @@ class Instruction1Param: public Instruction{
     protected:
         int *rs;
         bool isRsAddress;
+        std::mutex *rdm;
+        std::mutex *opm;
     public:
-    Instruction1Param(int& rs, bool isRsAddress):rs(&rs),isRsAddress(isRsAddress){
+    Instruction1Param(int& rs, bool isRsAddress, std::mutex &rdm,std::mutex &opm):rs(&rs),isRsAddress(isRsAddress),rdm(&rdm),opm(&opm){
 
     }
     virtual void exec()=0;

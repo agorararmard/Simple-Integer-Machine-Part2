@@ -1,10 +1,10 @@
 #include "Processor.h"
 
 
-void Proccessor::loadInstMem(std::string filename){
+void Processor::loadInstMem(std::string filename){
     int *d =dataMemory;
     Instruction **i = instMemory;
-    Parser P(d,i,pc, filename);
+    Parser P(d,i,pc, filename,ReadMutex,WriteMutex,memoryWrite);
     try{
     P.readInstMem();
     }catch(std::exception& exp){
@@ -14,7 +14,7 @@ void Proccessor::loadInstMem(std::string filename){
 }
 
 
-void Proccessor::run(){
+void Processor::run(){
     pc =0;
     while(true){
         try{

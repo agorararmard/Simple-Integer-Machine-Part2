@@ -66,7 +66,7 @@ void Parser::readInstMem(){
         getFirstParameter(line, firstParam);
         getSecondParameter(line, secondParam);
         getThirdParameter(line, thirdParam);
-        instMemory[inc] = instFactory.createInstruction(instType,firstParam,secondParam,thirdParam,*pc,dataMemory);
+        instMemory[inc] = instFactory.createInstruction(instType,firstParam,secondParam,thirdParam,*pc,dataMemory,ReadMutex,WriteMutex,memoryWrite);
         inc++;
     }    
     fin.close();

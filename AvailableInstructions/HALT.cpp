@@ -1,9 +1,6 @@
 #include "../sizes.h"
 #include "../Exceptions.h"
 class haltInstruction: public Instruction{
-    protected:
-        int *rs;
-        bool isRsAddress;
     public:
     haltInstruction(){}
     virtual void exec(){
