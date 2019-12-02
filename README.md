@@ -9,12 +9,17 @@
     ./out argv[1]
 
     argv[1]: numberOfCores; the number of cores to run on the nSIM processers.
+    
+    for example:
+    ./out 4
+
+    would initialize an nSIM with 4 cores.
   ```
   Once the code has run, you should then write explicity the location of each program on a separate line. Programs will be loaded parallely and they will be executed on therads.
   
   You can use the already existing sample programs [Sample Programs](./Sample_Programs). Example:
   ```
-    ./out ./Sample_Programs/sample3.txt
+    ./Sample_Programs/sample3.txt
   ```
 
   or you can add your own example program and run it using the same method.
@@ -75,6 +80,7 @@
 - It has an instruction memory.
 - It has a reference to the data memory of the nSIM class that constructed it.
 - It has a reference to the mutexes of the nSIM class that constructed it.
+- It has a reference to its exception_ptr at the parent nSIM class to forward exceptions.
 - It has a program counter.
 - It loads the program from a given file using the Parser and stores it in the instruction memory.
 - It runs the instruction memory starting from position 0.
@@ -88,6 +94,7 @@
 - It has a ReadMutex for input stream.
 - It has a WriteMutex for output stream.
 - It has a dynamic array of cores, each is a Processor instance.
+- It has a dynamic array of exception pointers to detect all exceptions that happen on each core. The first exception caught is the one passed, however, all exceptions are printed and cores doesn't terminate if other cores faced an exception.
 - It loads the programs from the given file names for each core respectively
 - It handles all exceptions by printing their values and rethrowing them for the main program in case further analysis is needed.
 
