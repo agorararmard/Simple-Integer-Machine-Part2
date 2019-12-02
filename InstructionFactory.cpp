@@ -33,6 +33,22 @@ void InstructionFactory::interpretMtx(std::string &param,std::mutex* &mtx, std::
             }
 }
 
+void InstructionFactory::sortMtxs(std::mutex* &mtx1,std::mutex* &mtx2,std::mutex* &mtx3){
+    if(mtx1 == nullptr){
+        if(mtx3 == nullptr){
+            mtx1 = mtx2;
+        }else{
+            mtx1 = mtx3;
+        }
+    }else if (mtx2 == nullptr){
+        mtx2 = mtx3;
+    }
+}
+void InstructionFactory::sortMtxs(std::mutex* &mtx1,std::mutex* &mtx2){
+    if(mtx1 == nullptr){
+            mtx1 = mtx2;
+    }
+}
 Instruction* InstructionFactory::createInstruction(std::string instType, std::string firstParam, std::string secondParam, std::string thirdParam,int&pc, int* &dataMemory, std::mutex* &ReadMutex, std::mutex* &WriteMutex, std::mutex* &memoryWrite){
 
     if(instType == "ADD"){
@@ -40,15 +56,17 @@ Instruction* InstructionFactory::createInstruction(std::string instType, std::st
         if(firstParam!="" &&secondParam !="" && thirdParam !="")
         {
             int *p1,*p2,*p3;
-            std::mutex *rdm;
-
+            std::mutex *rdm1,*rdm2,*rdm3;
+            int idx1,idx2,idx3;
             bool fp1 = interpretParam(firstParam,p1,dataMemory);
             bool fp2 = interpretParam(secondParam,p2,dataMemory);
             bool fp3 = interpretParam(thirdParam,p3,dataMemory);
-            if(fp3){
-                interpretMtx(thirdParam,rdm,memoryWrite);
-            }
-            return new addInstruction(*p1,fp1,*p2,fp2,*p3,fp3,*rdm);
+            interpretMtx(firstParam,rdm1,memoryWrite);
+            interpretMtx(secondParam,rdm2,memoryWrite);
+            interpretMtx(thirdParam,rdm3,memoryWrite);
+            sortMtxs(rdm1,rdm2,rdm3);
+
+            return new addInstruction(*p1,fp1,*p2,fp2,*p3,fp3,*rdm1,*rdm2,*rdm3);
         }
         else 
             throw InsufficientParameters("ADD");
@@ -58,14 +76,15 @@ Instruction* InstructionFactory::createInstruction(std::string instType, std::st
         if(firstParam!="" &&secondParam !="" && thirdParam =="")
         {
             int *p1,*p2;
-            std::mutex *rdm;
+            std::mutex *rdm1,*rdm2;
             bool fp2 = interpretParam(secondParam,p2,dataMemory);
             bool fp1 = interpretParam(firstParam,p1,dataMemory);
             
-            if(fp2){
-                interpretMtx(secondParam,rdm,memoryWrite);
-            }
-            return new negInstruction(*p1,fp1,*p2,fp2,*rdm);
+            interpretMtx(firstParam,rdm1,memoryWrite);
+            interpretMtx(secondParam,rdm2,memoryWrite);
+            sortMtxs(rdm1,rdm2);
+            
+            return new negInstruction(*p1,fp1,*p2,fp2,*rdm1,*rdm2);
         }
         else 
             throw InsufficientParameters("NEG");
@@ -76,16 +95,17 @@ Instruction* InstructionFactory::createInstruction(std::string instType, std::st
         if(firstParam!="" &&secondParam !="" && thirdParam !="")
         {
             int *p1,*p2,*p3;
-            std::mutex *rdm;
+            std::mutex *rdm1,*rdm2,*rdm3;
             bool fp3 = interpretParam(thirdParam,p3,dataMemory);
             bool fp1 = interpretParam(firstParam,p1,dataMemory);
             bool fp2 = interpretParam(secondParam,p2,dataMemory);
             
-            if(fp3){
-                interpretMtx(thirdParam,rdm,memoryWrite);
-            }
+            interpretMtx(firstParam,rdm1,memoryWrite);
+            interpretMtx(secondParam,rdm2,memoryWrite);
+            interpretMtx(thirdParam,rdm3,memoryWrite);
+            sortMtxs(rdm1,rdm2,rdm3);         
    
-            return new mulInstruction(*p1,fp1,*p2,fp2,*p3,fp3,*rdm);
+            return new mulInstruction(*p1,fp1,*p2,fp2,*p3,fp3,*rdm1,*rdm2,*rdm3);
         }
         else 
             throw InsufficientParameters("MUL");
@@ -96,10 +116,10 @@ Instruction* InstructionFactory::createInstruction(std::string instType, std::st
        if(firstParam!="" &&secondParam =="" && thirdParam =="")
         {
             int *p1;
-            std::mutex *rdm;
+            std::mutex *rdm1, *rdm2;
             bool fp1 = interpretParam(firstParam,p1,dataMemory);
-
-            return new jmpInstruction(*p1,fp1, pc,true,*rdm);
+            rdm2 = nullptr;
+            return new jmpInstruction(*p1,fp1, pc,true,*rdm1,*rdm2);
         }
         else 
             throw InsufficientParameters("JMP");
@@ -109,12 +129,17 @@ Instruction* InstructionFactory::createInstruction(std::string instType, std::st
        if(firstParam!="" &&secondParam !="" && thirdParam =="")
         {
             int *p1,*p2;
-            std::mutex * rdm;
+            std::mutex *rdm1,*rdm2,*rdm3;
 
             bool fp2 = interpretParam(secondParam,p2,dataMemory);
             bool fp1 = interpretParam(firstParam,p1,dataMemory);
 
-            return new jmp0Instruction(*p1,fp1,*p2,fp2,pc,true,*rdm);
+            interpretMtx(firstParam,rdm1,memoryWrite);
+            interpretMtx(secondParam,rdm2,memoryWrite);
+            sortMtxs(rdm1,rdm2);
+            rdm3 = nullptr;
+
+            return new jmp0Instruction(*p1,fp1,*p2,fp2,pc,true,*rdm1,*rdm2,*rdm3);
         }
         else 
             throw InsufficientParameters("JMP0");
@@ -125,15 +150,16 @@ Instruction* InstructionFactory::createInstruction(std::string instType, std::st
         if(firstParam!="" &&secondParam !="" && thirdParam =="")
         {
             int *p1,*p2;
-            std::mutex *rdm;
+            std::mutex *rdm1,*rdm2;
             bool fp2 = interpretParam(secondParam,p2,dataMemory);
             bool fp1 = interpretParam(firstParam,p1,dataMemory);
             
-            if(fp2){
-                interpretMtx(secondParam,rdm,memoryWrite);
-            }
+            
+            interpretMtx(firstParam,rdm1,memoryWrite);
+            interpretMtx(secondParam,rdm2,memoryWrite);
+            sortMtxs(rdm1,rdm2);
    
-            return new assInstruction(*p1,fp1,*p2,fp2,*rdm);
+            return new assInstruction(*p1,fp1,*p2,fp2,*rdm1,*rdm2);
         }
         else 
             throw InsufficientParameters("ASS");
@@ -143,16 +169,17 @@ Instruction* InstructionFactory::createInstruction(std::string instType, std::st
         if(firstParam!="" &&secondParam !="" && thirdParam !="")
         {
             int *p1,*p2,*p3;
-            std::mutex *rdm;
+            std::mutex *rdm1,*rdm2,*rdm3;
             bool fp3 = interpretParam(thirdParam,p3,dataMemory);
             bool fp1 = interpretParam(firstParam,p1,dataMemory);
             bool fp2 = interpretParam(secondParam,p2,dataMemory);
-            
-            if(fp3){
-                interpretMtx(thirdParam,rdm,memoryWrite);
-            }
+            interpretMtx(firstParam,rdm1,memoryWrite);
+            interpretMtx(secondParam,rdm2,memoryWrite);
+            interpretMtx(thirdParam,rdm3,memoryWrite);
+            sortMtxs(rdm1,rdm2,rdm3);
+
    
-            return new leInstruction(*p1,fp1,*p2,fp2,*p3,fp3,*rdm);
+            return new leInstruction(*p1,fp1,*p2,fp2,*p3,fp3,*rdm1,*rdm2,*rdm3);
         }
         else 
             throw InsufficientParameters("LE");
@@ -166,9 +193,8 @@ Instruction* InstructionFactory::createInstruction(std::string instType, std::st
             int *p;
             std::mutex * rdm;
             bool fp = interpretParam(firstParam,p,dataMemory);
-            if(fp){
-                interpretMtx(firstParam,rdm,memoryWrite);
-            }
+            interpretMtx(firstParam,rdm,memoryWrite);
+            
    
             return new readInstruction(*p,fp,*rdm,*ReadMutex);
         }
@@ -182,9 +208,8 @@ Instruction* InstructionFactory::createInstruction(std::string instType, std::st
             int *p;
             std::mutex * rdm;
             bool fp = interpretParam(firstParam,p,dataMemory);
-            if(fp){
-                interpretMtx(firstParam,rdm,memoryWrite);
-            }
+            interpretMtx(firstParam,rdm,memoryWrite);
+            
             return new writeInstruction(*p,fp,*rdm,*WriteMutex);
         }
         else 

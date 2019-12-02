@@ -7,10 +7,12 @@ class Instruction3Param: public Instruction{
         bool isRdAddress;
         bool isRs1Address;
         bool isRs2Address;
-        std::mutex *rdm;
+        std::mutex *rdm1;
+        std::mutex *rdm2;
+        std::mutex *rdm3;
     public:
     
-    Instruction3Param(int& rs1, bool isRs1Address,int& rs2, bool isRs2Address,int& rd, bool isRdAddress,std::mutex &rdm):rd(&rd),isRdAddress(isRdAddress),rs1(&rs1),isRs1Address(isRs1Address),rs2(&rs2),isRs2Address(isRs2Address),rdm(&rdm){
+    Instruction3Param(int& rs1, bool isRs1Address,int& rs2, bool isRs2Address,int& rd, bool isRdAddress,std::mutex &rdm1,std::mutex &rdm2,std::mutex &rdm3):rd(&rd),isRdAddress(isRdAddress),rs1(&rs1),isRs1Address(isRs1Address),rs2(&rs2),isRs2Address(isRs2Address),rdm1(&rdm1),rdm2(&rdm2),rdm3(&rdm3){
 
     }
     
