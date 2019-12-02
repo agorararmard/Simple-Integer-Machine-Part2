@@ -8,12 +8,14 @@ class readInstruction: public Instruction1Param{
         }
     }
     virtual void exec(){
-           std::unique_lock<std::mutex>  lck1 {*rdm, std::defer_lock};
-           std::unique_lock<std::mutex>  lck2 {*opm, std::defer_lock};
-         
-        lock(lck1,lck2);
+        if(rdm != nullptr) rdm->lock();
+        if(opm != nullptr) opm->lock();
+        
         std::cin >> *rs;
 
+        if(rdm != nullptr) rdm->unlock();
+        if(opm != nullptr) opm->unlock();
+        
     }
     ~readInstruction(){}
 };

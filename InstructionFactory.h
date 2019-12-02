@@ -10,9 +10,9 @@ class InstructionFactory
 private:
     int convertToInt(std::string s);    //convert a string to an integer. Report an error in case of failure i.e. the string is not a number
     bool interpretParam(std::string &param,int* &p,int* &dataMemory);   //translate the paramter into a memory reference or an immediate
-    void interpretMtx(std::string &param,std::mutex* &mtx, std::mutex* &memoryWrite);
-    void sortMtxs(std::mutex* &mtx1,std::mutex* &mtx2,std::mutex* &mtx3);
-    void sortMtxs(std::mutex* &mtx1,std::mutex* &mtx2);
+    void interpretMtx(std::string &param,std::mutex* &mtx, std::mutex* &memoryWrite, int& idx);
+    void sortMtxs(std::mutex* &mtx1,std::mutex* &mtx2,std::mutex* &mtx3, int idx1,int idx2, int idx3);
+    void sortMtxs(std::mutex* &mtx1,std::mutex* &mtx2,int idx1,int idx2);
 public:
     InstructionFactory(){}
     //return an Instruction pointer after paramter validation according to instType.

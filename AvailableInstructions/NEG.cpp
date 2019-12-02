@@ -8,23 +8,14 @@ class negInstruction: public Instruction2Param{
         }
     }
     virtual void exec(){
-                std::unique_lock<std::mutex> *lck1,*lck2;
-        if(rdm2 != nullptr){
-            lck1 = new std::unique_lock<std::mutex>{*rdm1, std::defer_lock};
-            lck2 = new std::unique_lock<std::mutex>{*rdm2, std::defer_lock};
-            std::lock(*lck1,*lck2);
-        }else{
-            rdm1->lock();
-        }
-       // if(isRdAddress) rdm1->lock();
-        *rd = -(*rs);
-     //   if(isRdAddress) rdm1->unlock();
-         if(rdm2 != nullptr){
-            delete lck1; 
-            delete lck2; 
-        }else{
-            rdm1->unlock();
-        }
+        if(rdm1 != nullptr) rdm1->lock();
+        if(rdm2 != nullptr) rdm2->lock();
+        
+          *rd = -(*rs);
+     
+        if(rdm1 != nullptr) rdm1->unlock();
+        if(rdm2 != nullptr) rdm2->unlock();
+        
     }
     ~negInstruction(){}
 };

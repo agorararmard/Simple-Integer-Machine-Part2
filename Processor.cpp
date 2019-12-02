@@ -19,7 +19,9 @@ void Processor::run(){
     while(true){
         try{
             if(pc == InstructionMemorySize) return;
+            WriteMutex->lock();
             std::cout << "\nProgram Counter: " << pc<< " Input/Output ---> ";
+            WriteMutex->unlock();
             if(instMemory[pc] == nullptr)   throw NullInstruction();
             instMemory[pc]->exec();
             pc++;

@@ -5,9 +5,15 @@ class writeInstruction: public Instruction1Param{
     writeInstruction(int& rs, bool isRsAddress,std::mutex &rdm,std::mutex &opm): Instruction1Param(rs, isRsAddress,rdm,opm){
     }
     virtual void exec(){
-        opm->lock();
+        
+        if(rdm != nullptr) rdm->lock();
+        if(opm != nullptr) opm->lock();
+        
         std::cout << *rs <<std::endl;
-        opm->unlock();
+        
+        if(rdm != nullptr) rdm->unlock();
+        if(opm != nullptr) opm->unlock();
+        
     }
     ~writeInstruction(){}
 };

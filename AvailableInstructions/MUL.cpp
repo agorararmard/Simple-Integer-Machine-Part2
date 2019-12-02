@@ -8,20 +8,10 @@ class mulInstruction: public Instruction3Param{
         }
     }
     virtual void exec(){
-        std::unique_lock<std::mutex> *lck1,*lck2,*lck3;
-        if(rdm2 != nullptr){
-            lck1 = new std::unique_lock<std::mutex>{*rdm1, std::defer_lock};
-            lck2 = new std::unique_lock<std::mutex>{*rdm2, std::defer_lock};
-            if(rdm3 == nullptr){   
-               std::lock(*lck1,*lck2);
-            }else{
-                lck3 = new std::unique_lock<std::mutex>{*rdm3, std::defer_lock};
-                std::lock(*lck1,*lck2,*lck3);
-            }
-        }else{
-            rdm1->lock();
-        }
-
+        if(rdm1 != nullptr) rdm1->lock();
+        if(rdm2 != nullptr) rdm2->lock();
+        if(rdm3 != nullptr) rdm3->lock();
+        
         int tmp1 = *rs1;
         int tmp2 = *rs2;
 
@@ -30,16 +20,10 @@ class mulInstruction: public Instruction3Param{
  //       if(isRdAddress) rdm1->unlock();
         int tmp3 = *rd;
      
-     if(rdm2 != nullptr){
-            delete lck1; 
-            delete lck2; 
-            if(rdm3 != nullptr){   
-                delete lck3;
-            }
-        }else{
-            rdm1->unlock();
-        }
-
+        if(rdm1 != nullptr) rdm1->unlock();
+        if(rdm2 != nullptr) rdm2->unlock();
+        if(rdm3 != nullptr) rdm3->unlock();
+        
         if(tmp1 !=0 && tmp2!=0){    //for detecting overflow
             if(tmp3/ tmp1 != tmp2){
                 throw OverFlow();
