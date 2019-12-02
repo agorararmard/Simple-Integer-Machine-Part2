@@ -6,10 +6,11 @@ void Processor::loadInstMem(std::string filename){
     Instruction **i = instMemory;
     Parser P(d,i,pc, filename,ReadMutex,WriteMutex,memoryWrite);
     try{
-    P.readInstMem();
+        P.readInstMem();
     }catch(std::exception& exp){
         std::cout << exp.what() << std::endl;
-        throw;
+        *myExceptionPtr = std::current_exception();
+        return;
     }
 }
 
@@ -25,7 +26,7 @@ void Processor::run(){
             if(instMemory[pc] == nullptr)   throw NullInstruction();
             instMemory[pc]->exec();
             pc++;
-        }catch(std::runtime_error& exp){
+        }catch(std::exception& exp){
             std::string s1 = HALTException().what(); 
             std::string s2 = exp.what(); 
             if(s2 == s1)
@@ -34,8 +35,9 @@ void Processor::run(){
                 return;
             }
             else {
-                std::cout << s2 << std::endl;
-                throw;    
+                std::cout << exp.what() << std::endl;
+                *myExceptionPtr = std::current_exception();
+                return;
             }
         }
     }

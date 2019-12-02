@@ -2,9 +2,13 @@
 
 nSIM::nSIM(int numberOfCores):n(numberOfCores){
     cores = new Processor*[n];
-    for(int i =0;i < n;i++)
-        cores[i] = new Processor(dataMemory,ReadMutex,WriteMutex,memoryWrite);
+    ExceptionPtr = new std::exception_ptr[n];
+    for(int i =0;i < n;i++){
+        //ExceptionPtr[i] = nullptr;
+        cores[i] = new Processor(dataMemory,ReadMutex,WriteMutex,memoryWrite, ExceptionPtr[i]);
+    }
 }
+
 void nSIM::load(){
     std::string filename;
     std::thread *threads = new std::thread[n];
@@ -14,12 +18,25 @@ void nSIM::load(){
             threads[i] = std::thread(&Processor::loadInstMem,cores[i],filename);
             cores[i]->loadInstMem(filename);
         }
+        std::cout <<"walahi 3detohom\b";
         for(int i =0; i < n;i++){
-            threads[i].join();
+            if(ExceptionPtr[i] != nullptr)
+                 std::rethrow_exception(ExceptionPtr[i]);
+            if(threads[i].joinable())
+                threads[i].join();
         }
+
         delete[] threads;
     }catch(std::exception& exp){
         std::cout << exp.what() << std::endl;
+
+        for(int i =0; i < n;i++){
+            if(threads[i].joinable())
+                threads[i].join();
+        }
+
+        delete[] threads;
+        
         throw;
     }
 }
@@ -29,14 +46,28 @@ void nSIM::run(){
     try{
         for(int i =0; i < n;i++){
             threads[i] = std::thread(&Processor::run,cores[i]);
-            //cores[i]->run();
         }
+        
         for(int i =0; i < n;i++){
-            threads[i].join();
+            if(ExceptionPtr[i] != nullptr)
+                 std::rethrow_exception (ExceptionPtr[i]);
+           
+            if(threads[i].joinable())
+                threads[i].join();
         }
+        
         delete[] threads;
-    }catch(std::runtime_error& exp){
+    
+    }catch(std::exception& exp){
         std::cout << exp.what() << std::endl;
+        
+        for(int i =0; i < n;i++){
+            if(threads[i].joinable())
+                threads[i].join();
+        }
+
+        delete[] threads;
+       
         throw;
     }
 }       

@@ -12,11 +12,11 @@ class Processor{
         std::mutex *memoryWrite;
         Instruction *instMemory[InstructionMemorySize];
         int pc;
-
+        std::exception_ptr* myExceptionPtr;
     public:
  
  
-        Processor(int* dm, std::mutex& rm, std::mutex& wm, std::mutex* mw):dataMemory(dm),ReadMutex(&rm),WriteMutex(&wm),memoryWrite(mw){}
+        Processor(int* dm, std::mutex& rm, std::mutex& wm, std::mutex* mw, std::exception_ptr& myExceptionPtr):dataMemory(dm),ReadMutex(&rm),WriteMutex(&wm),memoryWrite(mw),myExceptionPtr(&myExceptionPtr){}
         void loadInstMem(std::string filename);         //loading a program file into the instruction memory
         void run();                                     //running the program in the instruction memory starting with pc = 0 
         

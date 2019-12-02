@@ -11,6 +11,7 @@ class nSIM{
         std::mutex ReadMutex;
         std::mutex WriteMutex;
         std::mutex memoryWrite[dataMemorySize];
+        std::exception_ptr* ExceptionPtr;
     public:
         nSIM(int numberOfCores);  
         void load();

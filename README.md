@@ -1,23 +1,23 @@
 # Simple-Integer-Machine:
 ## How to Run:
-  To run the processor you should first compile the files that compose the processors by typing in this command:
+  To run the nSIM processor you should first compile the files that compose the processors by typing in this command:
   ```
-    g++ InstructionFactory.h Instructions.h sizes.h Exceptions.h Parser.h Processor.h main.cpp -o out
-    g++ -pthread InstructionFactory.h Instructions.h sizes.h Exceptions.h Parser.h Processor.h nSIM.h main2.cpp -o out
+    g++ -std=c++11 -pthread InstructionFactory.h Instructions.h sizes.h Exceptions.h Parser.h Processor.h nSIM.h main.cpp -o out
   ```
-  Now you can run the processor, by typing in the command line:
+  Now you can run the nSIM processor, by typing in the command line:
   ```
     ./out argv[1]
 
-    argv[1]: DIRECTORY/FILENAME.txt; the location and name of the file containing the code that you want the processor to run.
+    argv[1]: numberOfCores; the number of cores to run on the nSIM processers.
   ```
- 
+  Once the code has run, you should then write explicity the location of each program on a separate line. Programs will be loaded parallely and they will be executed on therads.
+  
   You can use the already existing sample programs [Sample Programs](./Sample_Programs). Example:
   ```
     ./out ./Sample_Programs/sample3.txt
   ```
 
-  or you can add your own example program and run it using the same command.
+  or you can add your own example program and run it using the same method.
 
 ## Processor and class construction:
 ### Instruction Representation:
@@ -73,11 +73,31 @@
 ### Processsor:
   This class encapsulates all other classes:
 - It has an instruction memory.
-- It has a data memory.
+- It has a reference to the data memory of the nSIM class that constructed it.
+- It has a reference to the mutexes of the nSIM class that constructed it.
 - It has a program counter.
 - It loads the program from a given file using the Parser and stores it in the instruction memory.
 - It runs the instruction memory starting from position 0.
 - It handles all exceptions by printing their values and rethrowing them for the main program in case further analysis is needed.
+- It locks mutexes upon accessing datamemory elements or input/output streams.
+
+### nSIM:
+  This class encapsulates all other classes:
+- It has a data memory.
+- It has an array of mutexes equal to the size of the data memory
+- It has a ReadMutex for input stream.
+- It has a WriteMutex for output stream.
+- It has a dynamic array of cores, each is a Processor instance.
+- It loads the programs from the given file names for each core respectively
+- It handles all exceptions by printing their values and rethrowing them for the main program in case further analysis is needed.
+
+## Handling Parallelism:
+### Threads:
+  Threads are opened as a group of pointer threads equal to the number of cores. Then each thread pointer is pointed at a thread that runs the method of interest in the processor: first loading, then running.
+### Race Conditions & Deadlocks:
+  Race Conditions are resolved with the use of mutexes. Each instruction receives a mutex for each datamemory address it accesses. Those mutexes are sorted at the instruction factory in a manner such that rdm1 holds a mutex to an address smaller than that held by rdm2.
+  The sorting of the mutexes and since all the execution threads are following the same sorting convention, Deadlocks cannot happen and therefore, are avoided.
+
 ## Sample Programs:
 ### Required Formatting:
   The program file should have one instruction per line with an empty line at the end of the file.
@@ -101,10 +121,10 @@
 
     This would add the value in memory address 1 to the Immediate 2 and then store the result in memory address 100
   ```
-### Sample1.txt:
+### sample1.txt:
     Performs all instructions in a random flow.
 
-### Sample2.txt:
+### sample2.txt:
   Sorting 3 numbers
   This program runs as follows:
   - Read 3 values from the user.
@@ -115,7 +135,7 @@
 
     Used instruction types: READ, LE, JMP0, JMP, ASS, WRITE, HALT
 
-### Sample3.txt:
+### sample3.txt:
   Calculating the factorial of a given number
   This program runs as follows:
   - Read 3 values from the user.
@@ -126,7 +146,7 @@
 
     Used instruction types: READ, ASS, MUL, ADD, JMP0, JMP, WRITE, HALT
 
-### Sample4.txt:
+### sample4.txt:
   Receives an array of numbers and computes the sum.
   This program runs as follows:
   - Read the array size from the user from the user.
@@ -139,7 +159,7 @@
 
     Used instruction types: READ, JMP0, JMP, ASS, ADD, WRITE, HALT
 
-### Sample5.txt:
+### sample5.txt:
   Receives an array of numbers and computes the product of all elements.
   This program runs as follows:
   - Read the array size from the user from the user.
@@ -152,6 +172,31 @@
 
     Used instruction types: READ, JMP0, JMP, ASS, ADD, MUL, WRITE, HALT
 
+### sample6.txt:
+  Perform operations on the same address operated on by Sample7.txt.
+  This program runs as follows:
+  - Assigns the number 3 into address 512 and the number 4 into address 513.
+
+  - Adds the conetent of 512 and 513 into 514.
+
+  - Prints 514.
+
+  - Multiplies the conetent of 512 and 513 into 515.
+
+  - Prints 515.
+    
+    Used instruction types: ASS, ADD, MUL, WRITE, HALT
+
+### sample7.txt:
+  Perform operations on the same address operated on by sample6.txt.
+  This program runs as follows:
+  - Assigns the number 3 into address 512, 513,514.
+
+  - Adds the -1 to the content of 512 and 513 into 514 into each address respectively.
+
+  - Prints the content of 512, 513, 514.
+    
+    Used instruction types: ASS, ADD, WRITE, HALT
 
 ### crash1.txt:
   Shows exception handling in case of missing parameters.

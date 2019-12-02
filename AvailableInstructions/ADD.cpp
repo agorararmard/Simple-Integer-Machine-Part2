@@ -10,20 +10,18 @@ class addInstruction: public Instruction3Param{
     }
     virtual void exec(){
 
-        if(rdm1 != nullptr) rdm1->lock();
-        if(rdm2 != nullptr) rdm2->lock();
-        if(rdm3 != nullptr) rdm3->lock();
-
+    if(rdm1 != nullptr) rdm1->lock();
+    if(rdm2 != nullptr) rdm2->lock();
+    if(rdm3 != nullptr) rdm3->lock();
         int tmp1 = *rs1;
         int tmp2 = *rs2;
 
         *rd = *rs1 + *rs2;
         int tmp3 = *rd;
-
        if(rdm1 != nullptr) rdm1->unlock();
         if(rdm2 != nullptr) rdm2->unlock();
         if(rdm3 != nullptr) rdm3->unlock();
-        
+
         if(tmp3 - tmp1 != tmp2) //for detecting overflow
             throw OverFlow();
      
